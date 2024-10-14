@@ -1,0 +1,14 @@
+#!/bin/bash
+
+read -p "enter 'y' to continue, other to abort: " CONF
+
+if [[ "$CONF" == "y" ]]; then
+  echo 'continue'
+  sudo apt install git gawk curl zsh vim -y 
+  vim +'PlugInstall --sync' +qa
+
+else
+  echo 'abort'
+  exit
+fi
+
