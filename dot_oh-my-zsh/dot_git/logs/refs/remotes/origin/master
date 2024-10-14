@@ -1,0 +1,5 @@
+0000000000000000000000000000000000000000 ac325a7caba6630538c39e1c0ffa192d866cdcff yousef.akbari <akbari7694@gmail.com> 1726556805 +0330	fetch --depth=1 origin: storing head
+ac325a7caba6630538c39e1c0ffa192d866cdcff 62cf1201b031399e7251abeee859e895ee825a48 yousef.akbari <akbari7694@gmail.com> 1728125996 +0330	pull --quiet --rebase origin master: fast-forward
+62cf1201b031399e7251abeee859e895ee825a48 d2d5155d41cbe183ef172fef1e83a29d116a5af6 yousef.akbari <akbari7694@gmail.com> 1728729138 +0330	fetch: fast-forward
+d2d5155d41cbe183ef172fef1e83a29d116a5af6 9bfa3395f34f63d14945e01c45c72ec43d372dfa yousef.akbari <akbari7694@gmail.com> 1728893511 +0330	fetch: fast-forward
+9bfa3395f34f63d14945e01c45c72ec43d372dfa b3ba8da4218c3b9e1e5e45e1d4c00d312ff7226b yousef.akbari <akbari7694@gmail.com> 1728907923 +0330	fetch: fast-forward
