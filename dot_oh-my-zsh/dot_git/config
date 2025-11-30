@@ -1,0 +1,23 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+	eol = lf
+	autocrlf = false
+[remote "master"]
+	url = https://github.com/ohmyzsh/ohmyzsh.git
+	fetch = +refs/heads/*:refs/remotes/master/*
+[oh-my-zsh]
+	remote = master
+[fsck]
+	zeroPaddedFilemode = ignore
+[fetch "fsck"]
+	zeroPaddedFilemode = ignore
+[receive "fsck"]
+	zeroPaddedFilemode = ignore
+[rebase]
+	autoStash = true
+[remote "origin"]
+	url = https://github.com/ohmyzsh/ohmyzsh.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
