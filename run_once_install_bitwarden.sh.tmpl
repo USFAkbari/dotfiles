@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# 1. Install System Dependencies (requires sudo)
+# Using a hash of the package list ensures this runs if you add new packages later
+echo "Ensuring system dependencies are installed..."
+sudo apt update
+sudo apt install -y rofi jq xsel curl keyutils unzip
+
+# 2. Create local bin directory if it doesn't exist
+mkdir -p $HOME/.local/bin
+
+# 3. Install Bitwarden CLI (bw)
+if ! command -v bw >/dev/null 2>&1; then
+  echo "Installing Bitwarden CLI..."
+  wget "https://vault.bitwarden.com/download/?app=cli&platform=linux" -O /tmp/bw.zip
+  unzip -o /tmp/bw.zip -d $HOME/.local/bin/
+  chmod +x $HOME/.local/bin/bw
+  rm /tmp/bw.zip
+else
+  echo "Bitwarden CLI already installed."
+fi
+
+# 4. Install bwmenu (Rofi Wrapper)
+if [ ! -f "$HOME/.local/bin/bwmenu" ]; then
+  echo "Installing bwmenu..."
+  curl -L -o $HOME/.local/bin/bwmenu https://raw.githubusercontent.com/mattydebie/bitwarden-rofi/master/bwmenu
+  chmod +x $HOME/.local/bin/bwmenu
+fi
+
+# 5. Install lib-bwmenu (Required Library)
+if [ ! -f "$HOME/.local/bin/lib-bwmenu" ]; then
+  echo "Installing lib-bwmenu..."
+  curl -L -o $HOME/.local/bin/lib-bwmenu https://raw.githubusercontent.com/mattydebie/bitwarden-rofi/master/lib-bwmenu
+  chmod +x $HOME/.local/bin/lib-bwmenu
+fi
+
+echo "Bitwarden installation complete."
