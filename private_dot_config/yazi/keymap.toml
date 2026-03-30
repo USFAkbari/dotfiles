@@ -1,0 +1,14 @@
+[[manager.prepend_keymap]]
+on   = [ "T" ]
+run  = 'shell "$SHELL" --block'
+desc = "Terminal"
+
+[[manager.prepend_keymap]]
+on   = [ "." ]
+run  = "hidden toggle"
+desc = "Toggle Hidden"
+
+[[manager.prepend_keymap]]
+on   = [ "v" ]
+run  = 'shell "code ."'
+desc = "VS Code"

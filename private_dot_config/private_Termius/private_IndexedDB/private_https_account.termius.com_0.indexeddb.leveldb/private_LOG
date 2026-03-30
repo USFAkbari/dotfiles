@@ -1,0 +1,36 @@
+2025/12/14-10:40:48.645 94e2 Reusing MANIFEST /home/usfakbari/.config/Termius/IndexedDB/https_account.termius.com_0.indexeddb.leveldb/MANIFEST-000001
+2025/12/14-10:40:48.645 94e2 Recovering log #35
+2025/12/14-10:40:48.645 94e2 Reusing old log /home/usfakbari/.config/Termius/IndexedDB/https_account.termius.com_0.indexeddb.leveldb/000035.log 
+2025/12/14-10:40:48.646 94e2 Delete type=2 #33
+2025/12/14-10:40:48.671 94e2 Level-0 table #40: started
+2025/12/14-10:40:48.673 94e2 Level-0 table #40: 3916 bytes OK
+2025/12/14-10:40:48.675 94e2 Delete type=0 #35
+2025/12/14-10:40:48.675 94e2 Manual compaction at level-0 from '\x00\x0d\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x0e\x00\x00\x00' @ 0 : 0; will stop at '\x00\x0d\x00\x00\x05' @ 626 : 1
+2025/12/14-10:40:48.675 94e2 Compacting 1@0 + 1@1 files
+2025/12/14-10:40:48.676 94e2 Generated table #41@0: 60 keys, 3602 bytes
+2025/12/14-10:40:48.676 94e2 Compacted 1@0 + 1@1 files => 3602 bytes
+2025/12/14-10:40:48.678 94e2 compacted to: files[ 0 1 1 0 0 0 0 ]
+2025/12/14-10:40:48.678 94e2 Delete type=2 #40
+2025/12/14-10:40:48.678 94e2 Manual compaction at level-0 from '\x00\x0d\x00\x00\x05' @ 626 : 1 .. '\x00\x0e\x00\x00\x00' @ 0 : 0; will stop at (end)
+2025/12/14-10:46:14.756 9b6a Level-0 table #43: started
+2025/12/14-10:46:14.758 9b6a Level-0 table #43: 8385 bytes OK
+2025/12/14-10:46:14.761 9b6a Delete type=2 #37
+2025/12/14-10:46:14.761 9b6a Delete type=0 #39
+2025/12/14-10:46:14.761 9b6a Manual compaction at level-0 from '\x00\x0e\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x0f\x00\x00\x00' @ 0 : 0; will stop at '\x00\x0e\x00\x00\x05' @ 683 : 1
+2025/12/14-10:46:14.761 9b6a Compacting 1@0 + 1@1 files
+2025/12/14-10:46:14.763 9b6a Generated table #44@0: 75 keys, 3946 bytes
+2025/12/14-10:46:14.763 9b6a Compacted 1@0 + 1@1 files => 3946 bytes
+2025/12/14-10:46:14.764 9b6a compacted to: files[ 0 1 1 0 0 0 0 ]
+2025/12/14-10:46:14.764 9b6a Delete type=2 #43
+2025/12/14-10:46:14.764 9b6a Manual compaction at level-0 from '\x00\x0e\x00\x00\x05' @ 683 : 1 .. '\x00\x0f\x00\x00\x00' @ 0 : 0; will stop at (end)
+2025/12/14-10:46:19.894 94e2 Level-0 table #46: started
+2025/12/14-10:46:19.895 94e2 Level-0 table #46: 3926 bytes OK
+2025/12/14-10:46:19.897 94e2 Delete type=2 #41
+2025/12/14-10:46:19.897 94e2 Delete type=0 #42
+2025/12/14-10:46:19.897 94e2 Manual compaction at level-0 from '\x00\x0f\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x10\x00\x00\x00' @ 0 : 0; will stop at '\x00\x0f\x00\x00\x05' @ 728 : 1
+2025/12/14-10:46:19.897 94e2 Compacting 1@0 + 1@1 files
+2025/12/14-10:46:19.899 94e2 Generated table #47@0: 87 keys, 4076 bytes
+2025/12/14-10:46:19.899 94e2 Compacted 1@0 + 1@1 files => 4076 bytes
+2025/12/14-10:46:19.900 94e2 compacted to: files[ 0 1 1 0 0 0 0 ]
+2025/12/14-10:46:19.900 94e2 Delete type=2 #46
+2025/12/14-10:46:19.900 94e2 Manual compaction at level-0 from '\x00\x0f\x00\x00\x05' @ 728 : 1 .. '\x00\x10\x00\x00\x00' @ 0 : 0; will stop at (end)
