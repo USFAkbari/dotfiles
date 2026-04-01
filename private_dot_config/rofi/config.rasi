@@ -8,7 +8,7 @@
 
 configuration {
 	/*---------- General setting ----------*/
-	modi: "drun,run,filebrowser,window";
+	modi: "drun,run,filebrowser,window,ssh";
 	case-sensitive: false;
 	cycle: true;
 	filter: "";
@@ -16,6 +16,8 @@ configuration {
 	normalize-match: true;
 	show-icons: true;
 	icon-theme: "Papirus";
+  normal-window: true;
+  display-columns: 1;
 /*	cache-dir: ;*/
 	steal-focus: false;
 /*	dpi: -1;*/
@@ -25,10 +27,10 @@ configuration {
 	tokenize: true;
 
 	/*---------- SSH settings ----------*/
-	ssh-client: "ssh";
-	ssh-command: "{terminal} -e {ssh-client} {host} [-p {port}]";
-	parse-hosts: true;
-	parse-known-hosts: true;
+	ssh-client: "wezterm";
+	ssh-command: "{terminal} start -- {ssh-client} {host} [-p {port}]";
+	parse-hosts:false;
+	parse-known-hosts: false;
 
 	/*---------- Drun settings ----------*/
 	drun-categories: "";
@@ -48,7 +50,7 @@ configuration {
 	/*---------- Run settings ----------*/
 	run-command: "{cmd}";
 	run-list-command: "";
-	run-shell-command: "{terminal} -e {cmd}";
+	run-shell-command: "{terminal} start -- bash -c '{cmd}; read -p \"Press any key to exit...\" -n1'";
 
 	/*---------- Fallback Icon ----------*/
 		run {
@@ -84,9 +86,9 @@ configuration {
 	display-filebrowser: "Files";
 
 	/*---------- Misc setting ----------*/
-	terminal: "rofi-sensible-terminal";
-	font: "Mono 12";
-	sort: false;
+	terminal: "wezterm";
+	font: "JetBrainsMono Nerd Font 10";
+	sort: true;
 	threads: 0;
 	click-to-exit: true;
 /*	ignored-prefixes: "";*/
@@ -106,6 +108,9 @@ configuration {
     }
 
 	/*---------- Keybindings ----------*/
+    kb-row-up: "Up,Control+p";
+    kb-row-down: "Down,Control+n";
+    kb-accept-entry: "Return,KP_Enter";
 /*
 	kb-primary-paste: "Control+V,Shift+Insert";
 	kb-secondary-paste: "Control+v,Insert";
@@ -122,7 +127,6 @@ configuration {
 	kb-remove-char-back: "BackSpace,Shift+BackSpace,Control+h";
 	kb-remove-to-eol: "Control+k";
 	kb-remove-to-sol: "Control+u";
-	kb-accept-entry: "Control+j,Control+m,Return,KP_Enter";
 	kb-accept-custom: "Control+Return";
 	kb-accept-custom-alt: "Control+Shift+Return";
 	kb-accept-alt: "Shift+Return";
@@ -132,7 +136,6 @@ configuration {
 	kb-mode-complete: "Control+l";
 	kb-row-left: "Control+Page_Up";
 	kb-row-right: "Control+Page_Down";
-	kb-row-down: "Down,Control+n";
 	kb-page-prev: "Page_Up";
 	kb-page-next: "Page_Down";
 	kb-row-first: "Home,KP_Home";
