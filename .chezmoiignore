@@ -1,6 +1,9 @@
 # Paths are target paths relative to $HOME. This file is a template.
 # Files with a .chezmoi prefix and the .chezmoiscripts/ directory are never deployed.
 
+# ---- repo documentation, never deployed ---------------------------------------
+README.md
+
 # ---- tool/agent artifacts that live in the repo directory, never deployed ----
 .claude-flow
 .swarm
