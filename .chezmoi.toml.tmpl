@@ -1,0 +1,33 @@
+{{- /*
+  Selected at init time:
+    CHEZMOI_ENV   = desktop | server | vm | work      (default: desktop)
+    CHEZMOI_LEVEL = simple | medium | high            (default: simple)
+
+  Example:
+    CHEZMOI_ENV=server CHEZMOI_LEVEL=medium chezmoi init --apply <user>/<repo>
+
+  Values are read once, at `chezmoi init`, and stored in the generated
+  chezmoi.toml. To change them later, run `chezmoi init` again.
+*/ -}}
+{{- $env := env "CHEZMOI_ENV" | default "desktop" -}}
+{{- $level := env "CHEZMOI_LEVEL" | default "simple" -}}
+
+{{- $validEnvs := list "desktop" "server" "vm" "work" -}}
+{{- $validLevels := list "simple" "medium" "high" -}}
+
+{{- if not (has $env $validEnvs) -}}
+{{-   fail (printf "Invalid CHEZMOI_ENV=%q. Valid values: desktop, server, vm, work" $env) -}}
+{{- end -}}
+{{- if not (has $level $validLevels) -}}
+{{-   fail (printf "Invalid CHEZMOI_LEVEL=%q. Valid values: simple, medium, high" $level) -}}
+{{- end -}}
+
+[data]
+    env = {{ $env | quote }}
+    level = {{ $level | quote }}
+    isDesktop = {{ eq $env "desktop" }}
+    isServer = {{ eq $env "server" }}
+    isVM = {{ eq $env "vm" }}
+    isWork = {{ eq $env "work" }}
+    isMedium = {{ or (eq $level "medium") (eq $level "high") }}
+    isHigh = {{ eq $level "high" }}

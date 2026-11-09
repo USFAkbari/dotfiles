@@ -1,0 +1,12 @@
+#!/bin/sh
+# Runs after chezmoi has cloned fzf into ~/.fzf (see .chezmoiexternal.toml.tmpl).
+# Downloads the fzf binary into ~/.fzf/bin. Shell integration is already handled
+# by ~/.fzf.zsh, so only the binary is fetched (--bin leaves rc files alone).
+# No sudo needed. Env: {{ .env }} / {{ .level }}
+set -eu
+
+if [ -x "$HOME/.fzf/install" ]; then
+  "$HOME/.fzf/install" --bin
+else
+  echo "$HOME/.fzf not found; skipping fzf binary install." >&2
+fi

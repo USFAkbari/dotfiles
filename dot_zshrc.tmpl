@@ -1,0 +1,100 @@
+{{- if or .isServer .isVM }}
+# SSH sessions on servers/VMs attach to (or create) a tmux session named "main".
+# Must run before the p10k instant prompt. Skipped inside tmux and for non-SSH logins.
+if [[ -o interactive && -z "$TMUX" && -n "$SSH_CONNECTION" ]] && command -v tmux >/dev/null 2>&1; then
+  exec tmux new-session -A -s main
+fi
+
+{{ end -}}
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# User-level binaries (tools installed by the chezmoi install script) and mise shims.
+export PATH="$HOME/.local/bin:$HOME/.local/share/mise/shims:$PATH"
+
+# Path to your Oh My Zsh installation (cloned by chezmoi, see .chezmoiexternal.toml.tmpl).
+export ZSH="$HOME/.oh-my-zsh"
+# Custom plugins and the theme live here, outside the oh-my-zsh clone.
+export ZSH_CUSTOM="$HOME/.zsh-custom"
+
+ZSH_THEME="powerlevel10k/powerlevel10k"
+
+# Extra completion definitions. Must be on fpath before oh-my-zsh runs compinit.
+fpath+=("$ZSH_CUSTOM/plugins/zsh-completions/src")
+
+# Completion behaviour: case-insensitive, arrow-key menu, colored candidates.
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
+zstyle ':completion:*' menu select
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+
+# Which plugins to load. Order matters: fzf-tab before autosuggestions, and
+# syntax-highlighting last.
+plugins=(
+	git
+	npm
+	node
+	sudo
+	extract
+	fzf
+	fzf-tab
+	zsh-completions
+{{- if .isMedium }}
+	docker
+	docker-compose
+	kubectl
+	gh
+{{- end }}
+{{- if .isHigh }}
+	you-should-use
+	zsh-autopair
+{{- end }}
+	zsh-autosuggestions
+	zsh-bat
+	zsh-history-substring-search
+	zsh-syntax-highlighting
+)
+
+source $ZSH/oh-my-zsh.sh
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# Plain-character prompt for SSH clients without a Nerd Font: export P10K_ASCII=1
+if [[ -n "$P10K_ASCII" ]] && (( $+functions[p10k] )); then
+  typeset -g POWERLEVEL9K_MODE=ascii
+  typeset -g POWERLEVEL9K_ICON_PADDING=none
+  p10k reload
+fi
+
+### FZF ###
+export FZF_DEFAULT_COMMAND='fd --type f --color=never --hidden'
+export FZF_CTRL_T_OPTS="--preview 'bat --color=always --line-range :50 {}'"
+export FZF_ALT_C_OPTS="--preview 'tree -C {} '"
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+{{- if .isDesktop }}
+
+### Rofi (desktop only) ###
+export PATH=$HOME/.config/rofi/scripts:$PATH
+{{- end }}
+
+{{- if .isWork }}
+
+### Work (placeholders: uncomment and fill in on the work machine) ###
+# export HTTP_PROXY="http://proxy.example.com:8080"
+# export HTTPS_PROXY="$HTTP_PROXY"
+# export NO_PROXY="localhost,127.0.0.1,.internal.example.com"
+{{- end }}
+
+### Tool hooks: each one is skipped silently when the tool is not installed ###
+command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
+command -v direnv >/dev/null 2>&1 && eval "$(direnv hook zsh)"
+command -v mise   >/dev/null 2>&1 && eval "$(mise activate zsh)"
+# atuin takes over Ctrl-R; the up arrow stays with history-substring-search.
+command -v atuin  >/dev/null 2>&1 && eval "$(atuin init zsh --disable-up-arrow)"
+command -v eza    >/dev/null 2>&1 && alias ls='eza --icons=auto --group-directories-first'
+command -v bat    >/dev/null 2>&1 && alias cat='bat --paging=never'

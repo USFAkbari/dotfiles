@@ -1,0 +1,38 @@
+#!/bin/sh
+# Installs the Bitwarden CLI (bw) on every environment, and the rofi wrapper
+# (bwmenu + lib-bwmenu) on desktop only, since bwmenu needs rofi.
+# Runs as the current user. No sudo needed. Each step is skipped when its file exists.
+#
+# Environment: {{ .env }} / {{ .level }}
+set -eu
+
+BIN_DIR="$HOME/.local/bin"
+mkdir -p "$BIN_DIR"
+
+if [ ! -x "$BIN_DIR/bw" ] && ! command -v bw >/dev/null 2>&1; then
+  echo "Installing Bitwarden CLI..."
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' EXIT
+  curl -fsSL -o "$tmp/bw.zip" "https://vault.bitwarden.com/download/?app=cli&platform=linux"
+  unzip -o "$tmp/bw.zip" -d "$BIN_DIR"
+  chmod +x "$BIN_DIR/bw"
+  trap - EXIT
+  rm -rf "$tmp"
+else
+  echo "Bitwarden CLI already installed."
+fi
+
+{{- if .isDesktop }}
+
+# Pinned to a commit so the downloaded scripts cannot change underneath you.
+BWMENU_REF="8be76fdd647c2bdee064e52603331d8e6ed5e8e2"
+for f in bwmenu lib-bwmenu; do
+  if [ ! -f "$BIN_DIR/$f" ]; then
+    echo "Installing $f..."
+    curl -fsSL -o "$BIN_DIR/$f" "https://raw.githubusercontent.com/mattydebie/bitwarden-rofi/$BWMENU_REF/$f"
+    chmod +x "$BIN_DIR/$f"
+  fi
+done
+{{- end }}
+
+echo "Bitwarden installation complete."

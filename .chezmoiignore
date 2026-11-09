@@ -1,0 +1,51 @@
+# Paths are target paths relative to $HOME. This file is a template.
+# Files with a .chezmoi prefix and the .chezmoiscripts/ directory are never deployed.
+
+# ---- tool/agent artifacts that live in the repo directory, never deployed ----
+.claude-flow
+.swarm
+agentdb.rvf
+agentdb.rvf.idmap.json
+
+# ---- environment-specific directories ----------------------------------------
+# Desktop-only GUI configs: rofi launchers/applets and the wezterm terminal.
+{{- if not .isDesktop }}
+.config/rofi
+.config/wezterm
+{{- end }}
+
+# ---- level-specific directories ----------------------------------------------
+# High-level-only configs. Deployed only when CHEZMOI_LEVEL=high.
+{{- if not .isHigh }}
+.config/high-only
+{{- end }}
+
+# ---- secret-looking files: never deployed ------------------------------------
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+**/*.kdbx
+**/id_rsa
+**/id_rsa.*
+**/id_ed25519
+**/id_ed25519.*
+**/id_ecdsa
+**/id_ecdsa.*
+**/known_hosts
+**/authorized_keys
+**/.env
+**/.env.*
+**/.netrc
+**/.npmrc
+**/.pypirc
+**/.git-credentials
+**/.docker/config.json
+.ssh
+.gnupg
+.aws
+.kube/config
+.config/gh/hosts.yml
+**/.zsh_history
+**/.bash_history
+**/.lesshst
