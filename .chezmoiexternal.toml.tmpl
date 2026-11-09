@@ -1,0 +1,89 @@
+{{- /*
+  Everything third-party is cloned on `chezmoi apply` instead of being copied
+  into this repo. Tracks the default branch, re-pulled weekly.
+
+  ZSH_CUSTOM is ~/.zsh-custom (see dot_zshrc.tmpl), so custom plugins and the
+  theme do not live inside the ~/.oh-my-zsh clone that chezmoi manages as a whole.
+*/ -}}
+[".oh-my-zsh"]
+    type = "git-repo"
+    url = "https://github.com/ohmyzsh/ohmyzsh.git"
+    refreshPeriod = "168h"
+    [".oh-my-zsh".clone]
+        args = ["--depth", "1"]
+    [".oh-my-zsh".pull]
+        args = ["--ff-only"]
+
+[".fzf"]
+    type = "git-repo"
+    url = "https://github.com/junegunn/fzf.git"
+    refreshPeriod = "168h"
+    [".fzf".clone]
+        args = ["--depth", "1"]
+
+[".zsh-custom/themes/powerlevel10k"]
+    type = "git-repo"
+    url = "https://github.com/romkatv/powerlevel10k.git"
+    refreshPeriod = "168h"
+    [".zsh-custom/themes/powerlevel10k".clone]
+        args = ["--depth", "1"]
+
+# ---- plugins: all levels ------------------------------------------------------
+[".zsh-custom/plugins/zsh-autosuggestions"]
+    type = "git-repo"
+    url = "https://github.com/zsh-users/zsh-autosuggestions.git"
+    refreshPeriod = "168h"
+    [".zsh-custom/plugins/zsh-autosuggestions".clone]
+        args = ["--depth", "1"]
+
+[".zsh-custom/plugins/zsh-syntax-highlighting"]
+    type = "git-repo"
+    url = "https://github.com/zsh-users/zsh-syntax-highlighting.git"
+    refreshPeriod = "168h"
+    [".zsh-custom/plugins/zsh-syntax-highlighting".clone]
+        args = ["--depth", "1"]
+
+[".zsh-custom/plugins/zsh-history-substring-search"]
+    type = "git-repo"
+    url = "https://github.com/zsh-users/zsh-history-substring-search.git"
+    refreshPeriod = "168h"
+    [".zsh-custom/plugins/zsh-history-substring-search".clone]
+        args = ["--depth", "1"]
+
+[".zsh-custom/plugins/zsh-bat"]
+    type = "git-repo"
+    url = "https://github.com/fdellwing/zsh-bat.git"
+    refreshPeriod = "168h"
+    [".zsh-custom/plugins/zsh-bat".clone]
+        args = ["--depth", "1"]
+
+[".zsh-custom/plugins/zsh-completions"]
+    type = "git-repo"
+    url = "https://github.com/zsh-users/zsh-completions.git"
+    refreshPeriod = "168h"
+    [".zsh-custom/plugins/zsh-completions".clone]
+        args = ["--depth", "1"]
+
+[".zsh-custom/plugins/fzf-tab"]
+    type = "git-repo"
+    url = "https://github.com/Aloxaf/fzf-tab.git"
+    refreshPeriod = "168h"
+    [".zsh-custom/plugins/fzf-tab".clone]
+        args = ["--depth", "1"]
+{{- if .isHigh }}
+
+# ---- plugins: high level only -------------------------------------------------
+[".zsh-custom/plugins/you-should-use"]
+    type = "git-repo"
+    url = "https://github.com/MichaelAquilina/zsh-you-should-use.git"
+    refreshPeriod = "168h"
+    [".zsh-custom/plugins/you-should-use".clone]
+        args = ["--depth", "1"]
+
+[".zsh-custom/plugins/zsh-autopair"]
+    type = "git-repo"
+    url = "https://github.com/hlissner/zsh-autopair.git"
+    refreshPeriod = "168h"
+    [".zsh-custom/plugins/zsh-autopair".clone]
+        args = ["--depth", "1"]
+{{- end }}

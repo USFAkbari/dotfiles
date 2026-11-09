@@ -11,7 +11,15 @@ theme="$type/$style"
 
 # Theme Elements
 prompt='Applications'
-mesg="Installed Packages : `pacman -Q | wc -l` (pacman)"
+# Count installed packages with whichever package manager this host has.
+if command -v pacman >/dev/null 2>&1; then
+	pkg_count="$(pacman -Q | wc -l) (pacman)"
+elif command -v dpkg-query >/dev/null 2>&1; then
+	pkg_count="$(dpkg-query -f '${Package}\n' -W | wc -l) (dpkg)"
+else
+	pkg_count="unknown"
+fi
+mesg="Installed Packages : ${pkg_count}"
 
 if [[ ( "$theme" == *'type-1'* ) || ( "$theme" == *'type-3'* ) || ( "$theme" == *'type-5'* ) ]]; then
 	list_col='1'

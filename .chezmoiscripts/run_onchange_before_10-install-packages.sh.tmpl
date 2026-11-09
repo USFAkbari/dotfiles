@@ -1,0 +1,223 @@
+#!/bin/bash
+# Installs packages for env={{ .env }}, level={{ .level }}.
+#
+# Targets: Ubuntu/Debian (apt) and macOS (Homebrew).
+#   * apt     system packages and tools with good distro versions (needs sudo)
+#   * mise    Linux tools apt lacks or ships too old; installed per user, no sudo
+#   * brew    everything on macOS
+#
+# Re-runs automatically when this script's rendered text changes (run_onchange_).
+# Idempotent: already-installed packages are skipped. A tool that cannot be
+# installed is a warning, not a failure.
+set -euo pipefail
+
+log()  { printf '==> %s\n' "$*"; }
+warn() { printf 'WARNING: %s\n' "$*" >&2; }
+
+# ---- package lists (rendered per environment and level) ----------------------
+
+# System packages from apt only.
+SYS_APT=(zsh git curl wget unzip jq tree)
+
+# "apt-name:mise-name" pairs. Used from apt when the distro has the package,
+# otherwise from mise. An empty mise-name means apt only.
+DUAL=("bat:bat" "fd-find:fd" "ripgrep:ripgrep" "eza:eza" "zoxide:zoxide" "git-delta:delta" "tealdeer:tealdeer")
+
+# Tools installed with mise on Linux.
+MISE_ONLY=(atuin fastfetch)
+
+# Homebrew names for macOS.
+BREW=(zsh git curl wget unzip jq tree bat fd ripgrep eza zoxide git-delta tealdeer atuin fastfetch)
+{{- if or .isServer .isVM }}
+
+# tmux: needed for SSH auto-attach on servers and VMs.
+SYS_APT+=(tmux)
+BREW+=(tmux)
+{{- end }}
+{{- if .isDesktop }}
+
+# desktop (Linux): rofi launchers, clipboard helpers for X11 and Wayland.
+SYS_APT+=(rofi xsel xclip wl-clipboard keyutils)
+{{- end }}
+{{- if .isServer }}
+
+# server: SSH brute-force protection, SSH daemon, roaming shell, disk usage.
+SYS_APT+=(fail2ban openssh-server mosh ncdu)
+BREW+=(mosh ncdu)
+{{- end }}
+{{- if .isVM }}
+
+# vm: server tools plus hypervisor integration (clean shutdown/snapshots, shared clipboard).
+SYS_APT+=(fail2ban openssh-server mosh ncdu qemu-guest-agent spice-vdagent)
+BREW+=(mosh ncdu)
+{{- end }}
+{{- if .isMedium }}
+
+# medium: dev tools.
+{{- if not (or .isServer .isVM) }}
+SYS_APT+=(tmux)
+BREW+=(tmux)
+{{- end }}
+DUAL+=("direnv:direnv" "shellcheck:shellcheck" "gh:gh" "just:just")
+MISE_ONLY+=(neovim zellij yazi uv lazygit lazydocker k9s yq kubectl)
+BREW+=(direnv shellcheck gh just neovim zellij yazi uv lazygit lazydocker k9s yq kubectl docker)
+{{- end }}
+{{- if .isHigh }}
+
+# high: monitoring and heavier tooling.
+SYS_APT+=(btop)
+DUAL+=("duf:duf" "hyperfine:hyperfine")
+MISE_ONLY+=(dust procs glow trippy difftastic tokei)
+BREW+=(btop duf hyperfine dust procs glow trippy difftastic tokei)
+{{- end }}
+
+# ---- helpers -----------------------------------------------------------------
+
+detect_manager() {
+  case "$(uname -s)" in
+    Darwin) echo brew; return ;;
+    Linux) ;;
+    *) echo unsupported; return ;;
+  esac
+  # shellcheck disable=SC1091
+  . /etc/os-release
+  case " ${ID:-} ${ID_LIKE:-} " in
+    *" debian "*|*" ubuntu "*) echo apt ;;
+    *) echo unsupported ;;
+  esac
+}
+
+# Run a system package command as root, using sudo when not already root.
+# sudo is used ONLY here, for apt.
+run_root() {
+  if [ "$(id -u)" -eq 0 ]; then
+    "$@"
+  elif command -v sudo >/dev/null 2>&1; then
+    sudo "$@"
+  else
+    warn "Need root or sudo to run: $*"
+    return 1
+  fi
+}
+
+apt_install() { run_root env DEBIAN_FRONTEND=noninteractive apt-get install -y "$@"; }
+
+# Install a list in one call; if that fails, retry one at a time so a single
+# unavailable name does not block the rest.
+install_list() {
+  local installer="$1"; shift
+  [ "$#" -gt 0 ] || return 0
+  if "$installer" "$@"; then
+    return 0
+  fi
+  warn "Bulk install failed; retrying package by package."
+  local p
+  for p in "$@"; do
+    "$installer" "$p" || warn "Could not install '$p'."
+  done
+}
+
+brew_install() { brew install "$@"; }
+
+apt_has() { apt-cache show "$1" >/dev/null 2>&1; }
+
+# Debian/Ubuntu install bat as "batcat" and fd as "fdfind". Link them as bat/fd.
+link_debian_names() {
+  mkdir -p "$HOME/.local/bin"
+  if command -v batcat >/dev/null 2>&1 && ! command -v bat >/dev/null 2>&1; then
+    ln -sf "$(command -v batcat)" "$HOME/.local/bin/bat"
+  fi
+  if command -v fdfind >/dev/null 2>&1 && ! command -v fd >/dev/null 2>&1; then
+    ln -sf "$(command -v fdfind)" "$HOME/.local/bin/fd"
+  fi
+}
+
+# Install mise (per user, ~/.local/bin) from the official release, verifying its
+# SHA-256 against the release's SHASUMS256.txt.
+ensure_mise() {
+  if command -v mise >/dev/null 2>&1 || [ -x "$HOME/.local/bin/mise" ]; then
+    return 0
+  fi
+  local arch ver base asset tmp
+  case "$(uname -m)" in
+    x86_64) arch=x64 ;;
+    aarch64|arm64) arch=arm64 ;;
+    *) warn "No mise build for $(uname -m); skipping mise tools."; return 1 ;;
+  esac
+  ver="$(curl -fsSIL -o /dev/null -w '%{url_effective}' https://github.com/jdx/mise/releases/latest)"
+  ver="${ver##*/}"
+  base="https://github.com/jdx/mise/releases/download/${ver}"
+  asset="mise-${ver}-linux-${arch}"
+  tmp="$(mktemp -d)"
+  log "Installing mise ${ver}"
+  curl -fsSL -o "$tmp/$asset" "$base/$asset"
+  curl -fsSL -o "$tmp/SHASUMS256.txt" "$base/SHASUMS256.txt"
+  local want
+  want="$(grep -F "$asset" "$tmp/SHASUMS256.txt" | awk '{print $1}' | head -n1)"
+  if [ -z "$want" ] || [ "$(sha256sum "$tmp/$asset" | awk '{print $1}')" != "$want" ]; then
+    warn "mise checksum mismatch; not installing."
+    rm -rf "$tmp"
+    return 1
+  fi
+  mkdir -p "$HOME/.local/bin"
+  install -m 0755 "$tmp/$asset" "$HOME/.local/bin/mise"
+  rm -rf "$tmp"
+}
+
+# Install tools with mise as global defaults. Failures are warnings.
+mise_install() {
+  [ "$#" -gt 0 ] || return 0
+  ensure_mise || return 0
+  local mise_bin t
+  mise_bin="$(command -v mise || echo "$HOME/.local/bin/mise")"
+  for t in "$@"; do
+    "$mise_bin" use --global --yes "$t@latest" || warn "mise could not install '$t'."
+  done
+}
+
+# ---- main --------------------------------------------------------------------
+
+main() {
+  local mgr
+  mgr="$(detect_manager)"
+  if [ "$mgr" = unsupported ]; then
+    warn "Unsupported OS: $(uname -s). Supported: Debian/Ubuntu and macOS."
+    exit 1
+  fi
+  log "Package manager: $mgr (env={{ .env }}, level={{ .level }})"
+
+  case "$mgr" in
+    apt)
+      run_root env DEBIAN_FRONTEND=noninteractive apt-get update -qq
+      local apt_list=("${SYS_APT[@]}") mise_list=("${MISE_ONLY[@]}") pair a m
+      for pair in "${DUAL[@]}"; do
+        a="${pair%%:*}"; m="${pair#*:}"
+        if apt_has "$a"; then
+          apt_list+=("$a")
+        elif [ -n "$m" ]; then
+          mise_list+=("$m")
+        else
+          warn "'$a' is not available in apt and has no fallback."
+        fi
+      done
+{{- if .isMedium }}
+      # Docker CLI only (no daemon): docker-cli if the distro has it, else docker.io.
+      if apt_has docker-cli; then apt_list+=(docker-cli); else apt_list+=(docker.io); fi
+{{- end }}
+      install_list apt_install "${apt_list[@]}"
+      link_debian_names
+      mise_install "${mise_list[@]}"
+      ;;
+    brew)
+      if ! command -v brew >/dev/null 2>&1; then
+        warn "Homebrew not found. Install it first: https://brew.sh"
+        exit 1
+      fi
+      install_list brew_install "${BREW[@]}"
+      ;;
+  esac
+
+  log "Package installation finished."
+}
+
+main "$@"

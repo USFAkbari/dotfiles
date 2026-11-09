@@ -1,0 +1,32 @@
+#!/bin/sh
+# Installs Hack Nerd Font for the p10k prompt icons (nerdfont-v3). Desktop only.
+# User-level install, no sudo. Skipped if the font is already present.
+# Env: {{ .env }} / {{ .level }}
+set -eu
+
+{{- if .isDesktop }}
+
+case "$(uname -s)" in
+  Darwin) FONT_DIR="$HOME/Library/Fonts" ;;
+  *) FONT_DIR="$HOME/.local/share/fonts/NerdFonts" ;;
+esac
+
+if ls "$FONT_DIR"/HackNerdFont-Regular.ttf >/dev/null 2>&1; then
+  echo "Hack Nerd Font already installed."
+  exit 0
+fi
+
+echo "Installing Hack Nerd Font..."
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+curl -fsSL -o "$tmp/Hack.zip" "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Hack.zip"
+mkdir -p "$FONT_DIR"
+unzip -o -q "$tmp/Hack.zip" '*.ttf' -d "$FONT_DIR"
+if command -v fc-cache >/dev/null 2>&1; then
+  fc-cache -f "$FONT_DIR"
+fi
+echo "Hack Nerd Font installed to $FONT_DIR"
+{{- else }}
+
+echo "Not a desktop environment; skipping Nerd Font install."
+{{- end }}
