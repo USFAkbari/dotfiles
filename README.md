@@ -34,8 +34,25 @@ Requirements:
 - Ubuntu or Debian (apt), or macOS (Homebrew installed first: <https://brew.sh>)
 - `git`, `curl`, and `sudo` on Linux (only the apt step needs root)
 
-Install chezmoi with the [official install docs](https://www.chezmoi.io/install/),
-then init from this repo. Pick your environment and level:
+**Default install** (no variables set = `desktop` environment, `simple` level):
+
+```bash
+sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply USFAkbari/dotfiles
+```
+
+This installs chezmoi into `./bin`, clones this repo, and applies it.
+Chezmoi's installer writes to `./bin` by default. To install chezmoi system-wide
+instead, use the [official install docs](https://www.chezmoi.io/install/) or
+`brew install chezmoi` on macOS.
+
+**Choose environment and level** by setting the variables before `init`:
+
+```bash
+CHEZMOI_ENV=server CHEZMOI_LEVEL=medium \
+  sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply USFAkbari/dotfiles
+```
+
+If chezmoi is already installed, skip the installer and run only:
 
 ```bash
 CHEZMOI_ENV=server CHEZMOI_LEVEL=medium chezmoi init --apply USFAkbari/dotfiles
@@ -43,7 +60,7 @@ CHEZMOI_ENV=server CHEZMOI_LEVEL=medium chezmoi init --apply USFAkbari/dotfiles
 
 Afterwards, restart your shell (or run `exec zsh`).
 
-Dry run first, to see what would change without installing anything:
+**Dry run** to see what would change without installing anything:
 
 ```bash
 CHEZMOI_ENV=desktop CHEZMOI_LEVEL=simple chezmoi init USFAkbari/dotfiles
